@@ -17,6 +17,7 @@ import os
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -24,39 +25,96 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 # Constants
 REGULARIZATION_RATE = 0.01
 
-# load data
-data = pd.read_csv(os.path.join("data", "wine.csv"))
 
-# Extract training features
-features = data.columns.values.tolist()
+def load_data_and_extract_features(filepath):
+    """ Load data from a csv file and split into
+        testing and training data (30%:70%)
 
-# Separate WineVariety data from other characteristics
-x, y = data[features].values, data["WineVariety"].values
+    Keyword arguments:
+    filepath:   A string containing the filepath, filename,
+                and filetype of the file containing the data of interest
 
-# Split the data into test and train
-# (setting random_state to see consistent inputs
-#   whilst trying different training techniques)
-x_train, x_test, y_train, y_test = train_test_split(
-    x, y, test_size=0.30, random_state=0)
+    Outputs:
+    x_train, x_test, y_train, y_test
+    """
 
-# Train LogisticRegression model, but scale numeric features
-pipeline = Pipeline(steps=[
-    ('standardscaler', StandardScaler()),
-    ('logregressor', LogisticRegression(
-        C=1/REGULARIZATION_RATE, solver="liblinear"))])
-model = pipeline.fit(x_train, y_train)
+    # load data
+    data = pd.read_csv(filepath)
 
-# Predict using our verification (test) data
+    # Extract training features
+    features = data.columns.values.tolist()
+
+    # Separate WineVariety data from other characteristics
+    x, y = data[features].values, data["WineVariety"].values
+
+    # Split the data into test and train
+    # (setting random_state to see consistent inputs
+    #   whilst trying different training techniques)
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.30, random_state=0)
+
+    return x_train, x_test, y_train, y_test
+
+
+def train_model(model_class, x_train, y_train):
+    """ Preprocess by scaling all x_train data as numeric features.
+        Then train already declared model, on x_train and y_train model data.
+
+    Keyword arguments:
+    model_class: Declared classification model of choice,
+                 including any arguments.
+                 Eg. RandomForestClassifier(n_estimators=100)
+    x_train:     The input training data
+    y_train:     The training labels
+
+    Outputs:
+    model:       Classification model of choice fit to x and y training data.
+
+    """
+
+    # Train classification model, but scale numeric features
+    pipeline = Pipeline(steps=[
+        ('standardscaler', StandardScaler()),
+        ('logregressor', model_class)])
+
+    # Fit model to x and y training data
+    model = pipeline.fit(x_train, y_train)
+
+    # Return fitted model
+    return model
+
+
+def evaluate_and_print_model(y_test, predictions):
+    """ Compare model's predictions with correct y_test data. """
+
+    # Compare our predictions to the correct values
+    print(f"Prediction: \n{predictions}")
+    print(f"Correct: \n{y_test}")
+
+    # Print accuracy score, where 1 is 100% accurate and 0 is 0% accurate
+    accuracy = accuracy_score(y_test, predictions)
+    print(f"\nAccuracy score: {round(accuracy, 3)}")
+
+    # Print confusion matrix for visual representation of
+    # false positives, false negatives, true positive, and true negatives
+    calculated_confusion_matrix = confusion_matrix(y_test, predictions)
+    print(calculated_confusion_matrix)
+
+    return accuracy, calculated_confusion_matrix
+
+
+# Load in wine classification data
+x_train, x_test, y_train, y_test = load_data_and_extract_features(
+    os.path.join("data", "wine.csv"))
+
+# Train LogisticRegression model, predict using test data, and evaluate model
+model = train_model(LogisticRegression(
+    C=1/REGULARIZATION_RATE, solver="liblinear"), x_train, y_train)
 predictions = model.predict(x_test)
+evaluate_and_print_model(y_test, predictions)
 
-# Compare our predictions to the correct values
-print(f"Prediction: \n{predictions}")
-print(f"Correct: \n{y_test}")
-
-# Print accuracy score, where 1 is 100% accurate and 0 is 0% accurate
-print(f"\nAccuracy score: {round(accuracy_score(y_test, predictions), 3)}")
-
-# Print confusion matrix for visual representation of
-# false positives, false negatives, true positive, and true negatives
-calculated_confusion_matrix = confusion_matrix(y_test, predictions)
-print(calculated_confusion_matrix)
+# Train RandomForestClassifier model, predict using test data,
+# and evaluate model
+model = train_model(RandomForestClassifier(n_estimators=100), x_train, y_train)
+predictions = model.predict(x_test)
+evaluate_and_print_model(y_test, predictions)
