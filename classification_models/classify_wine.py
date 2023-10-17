@@ -14,6 +14,7 @@ Data originally from:
 import os
 
 # External imports
+import joblib
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -103,6 +104,17 @@ def evaluate_and_print_model(y_test, predictions):
     return accuracy, calculated_confusion_matrix
 
 
+def save_model(model, filename):
+    """ Save trained model as a pickle file
+
+    Keyword arguments:
+    model:      Trained model instance to be saved
+    filename:   File name you would like to save the model under
+
+    """
+    joblib.dump(model, filename)
+
+
 # Load in wine classification data
 x_train, x_test, y_train, y_test = load_data_and_extract_features(
     os.path.join("data", "wine.csv"))
@@ -112,9 +124,11 @@ model = train_model(LogisticRegression(
     C=1/REGULARIZATION_RATE, solver="liblinear"), x_train, y_train)
 predictions = model.predict(x_test)
 evaluate_and_print_model(y_test, predictions)
+save_model(model, 'wine_logistic_regression_model.pkl')
 
 # Train RandomForestClassifier model, predict using test data,
 # and evaluate model
 model = train_model(RandomForestClassifier(n_estimators=100), x_train, y_train)
 predictions = model.predict(x_test)
 evaluate_and_print_model(y_test, predictions)
+save_model(model, 'wine_random_forest_model.pkl')
