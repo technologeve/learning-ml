@@ -15,6 +15,7 @@ import os
 
 # External imports
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -46,7 +47,8 @@ def load_data_and_extract_features(filepath):
     features = data.columns.values.tolist()
 
     # Separate WineVariety data from other characteristics
-    x, y = data[features].values, data["WineVariety"].values
+    x, y = np.delete(
+        data[features].values, -1, axis=1), data["WineVariety"].values
 
     # Split the data into test and train
     # (setting random_state to see consistent inputs
