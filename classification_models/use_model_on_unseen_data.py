@@ -15,6 +15,7 @@ unseen_data_1 = np.array([[13.72, 1.43, 2.5, 16.7, 108, 3.4, 3.67,
 unseen_data_2 = np.array([[12.37, 0.94, 1.36, 10.6, 88, 1.98, 0.57,
                            0.28, 0.42, 1.95, 1.05, 1.82, 520]])
 
+# Predict using logistic regression model
 print("Logistic regression model predictions:")
 
 logistic_regression_model = joblib.load(os.path.join(
@@ -24,6 +25,7 @@ logistic_regression_model = joblib.load(os.path.join(
 print(f"First sample: {logistic_regression_model.predict(unseen_data_1)}")
 print(f"Second sample: {logistic_regression_model.predict(unseen_data_2)}")
 
+# Predict using random forest classifier
 print("\nRandom forest classifier model predictions:")
 
 random_forest_classifier_model = joblib.load(os.path.join(
