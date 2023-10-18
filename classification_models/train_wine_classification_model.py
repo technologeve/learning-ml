@@ -8,6 +8,8 @@ Data originally from:
     Institute of Pharmaceutical and Food Analysis and Technologies,
     Via Brigata Salerno, 16147 Genoa, Italy.
 
+Training two classification models on sample data.
+
 """
 
 # Standard library imports
