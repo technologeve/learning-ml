@@ -1,4 +1,4 @@
-""" Completing Microsoft Learn"s Wine Classification Chllenge.
+""" Completing Microsoft Learn's Wine Classification Challenge.
     The goal is to achieve a recall metric of over 0.95.
 
 Data originally from:
